@@ -6,11 +6,12 @@ import Link from "next/link";
 import Script from "next/script";
 import {
   ArrowLeft, Calendar, Clock, Users, CreditCard,
-  ChevronRight, Check, Phone, AlertCircle, Loader2, Navigation,
+  ChevronRight, Check, Phone, Loader2, Navigation, MessageCircle,
 } from "lucide-react";
 import { FORFAITS, PRICE_PER_KM, MIN_PRICE, calculateDeposit } from "@/lib/pricing";
 import { calculateDistance } from "@/lib/distance";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
+import { buildWhatsAppUrl, buildReservationMessage } from "@/components/WhatsAppButton";
 
 type Step = "trajet" | "details" | "confirm";
 
@@ -139,6 +140,26 @@ function ReservationContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
+
+      // Ouvrir WhatsApp avec le récap
+      const trajet = forfait
+        ? `${forfait.from} → ${forfait.to}`
+        : `${customFrom} → ${customTo}`;
+      const whatsappUrl = buildWhatsAppUrl(
+        buildReservationMessage({
+          trajet,
+          allerRetour,
+          date,
+          time,
+          passengers,
+          name,
+          phone,
+          price,
+          notes,
+        })
+      );
+      window.open(whatsappUrl, "_blank");
+
       setSubmitted(true);
     } catch {
       alert("Erreur lors de la réservation. Veuillez réessayer.");
@@ -156,14 +177,27 @@ function ReservationContent() {
           </div>
           <h1 className="text-2xl font-bold mb-2">Réservation confirmée !</h1>
           <p className="text-zinc-400 mb-6">
-            Morgan a bien reçu votre demande. Vous recevrez une confirmation par SMS et email sous peu.
+            Votre demande a été envoyée via WhatsApp. Morgan vous confirmera rapidement.
           </p>
           <div className="card-dark p-4 text-left text-sm space-y-2 mb-6">
             <p><span className="text-zinc-500">Trajet :</span> {forfait ? `${forfait.from} → ${forfait.to}` : `${customFrom} → ${customTo}`}{allerRetour ? " (A/R)" : ""}</p>
             <p><span className="text-zinc-500">Date :</span> {date} à {time}</p>
             <p><span className="text-zinc-500">Prix total :</span> <span className="text-[#C9A84C] font-bold">{price}€</span></p>
           </div>
-          <Link href="/" className="btn-gold inline-block">Retour à l&apos;accueil</Link>
+          <div className="flex flex-col gap-3">
+            <a
+              href={buildWhatsAppUrl(buildReservationMessage({
+                trajet: forfait ? `${forfait.from} → ${forfait.to}` : `${customFrom} → ${customTo}`,
+                allerRetour, date, time, passengers, name, phone, price, notes,
+              }))}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 py-3 px-6 bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold rounded-lg transition"
+            >
+              Renvoyer via WhatsApp
+            </a>
+            <Link href="/" className="btn-gold inline-block text-center">Retour à l&apos;accueil</Link>
+          </div>
         </div>
       </div>
     );
@@ -449,10 +483,10 @@ function ReservationContent() {
               </div>
             </div>
 
-            <div className="mt-4 card-dark p-4 border-yellow-900/30 bg-yellow-900/5 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-[#C9A84C] shrink-0 mt-0.5" />
+            <div className="mt-4 card-dark p-4 border-green-900/30 bg-green-900/5 flex items-start gap-3">
+              <MessageCircle className="w-5 h-5 text-[#25D366] shrink-0 mt-0.5" />
               <p className="text-sm text-zinc-400">
-                Le paiement en ligne sera disponible prochainement. Pour l&apos;instant, Morgan vous contactera pour confirmer la réservation et le paiement se fera en véhicule (carte ou espèces).
+                En confirmant, votre réservation sera envoyée à Morgan via WhatsApp. Paiement en véhicule (carte, espèces ou SumUp).
               </p>
             </div>
 
