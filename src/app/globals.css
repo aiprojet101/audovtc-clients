@@ -91,3 +91,31 @@ body {
 .hero-gradient {
   background: radial-gradient(ellipse at 50% 0%, rgba(201, 168, 76, 0.08) 0%, transparent 60%);
 }
+
+/* Google Maps Autocomplete dropdown dark theme */
+.pac-container {
+  background: #141414 !important;
+  border: 1px solid #262626 !important;
+  border-radius: 0.5rem !important;
+  margin-top: 4px !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5) !important;
+  font-family: inherit !important;
+}
+.pac-item {
+  padding: 10px 14px !important;
+  border-top: 1px solid #1A1A1A !important;
+  color: #E5E5E5 !important;
+  cursor: pointer !important;
+  font-size: 0.875rem !important;
+}
+.pac-item:first-child { border-top: none !important; }
+.pac-item:hover, .pac-item-selected {
+  background: #1A1A1A !important;
+}
+.pac-item-query { color: #F5F5F5 !important; font-weight: 500 !important; }
+.pac-matched { color: #C9A84C !important; }
+.pac-icon { display: none !important; }
+.pac-item span:last-child { color: #666 !important; font-size: 0.75rem !important; }
+
+/* Smooth scroll */
+html { scroll-behavior: smooth; }

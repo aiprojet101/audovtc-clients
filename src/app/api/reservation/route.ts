@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
+import { sendTelegramNotification, formatReservationMessage } from "@/lib/telegram";
+import { FORFAITS } from "@/lib/pricing";
 
 // Stockage fichier JSON en attendant la base de données
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -71,8 +73,28 @@ export async function POST(request: NextRequest) {
     reservations.push(reservation);
     await saveReservations(reservations);
 
-    // TODO: Envoyer SMS à Morgan via Twilio
-    // TODO: Envoyer email de confirmation au client
+    // Notification Telegram à Morgan
+    const forfait = reservation.forfaitId
+      ? FORFAITS.find((f) => f.id === reservation.forfaitId)
+      : null;
+    const trajet = forfait
+      ? `${forfait.from} → ${forfait.to}`
+      : `${reservation.customFrom} → ${reservation.customTo}`;
+
+    await sendTelegramNotification(
+      formatReservationMessage({
+        id: reservation.id,
+        name: reservation.name,
+        phone: reservation.phone,
+        date: reservation.date,
+        time: reservation.time,
+        passengers: reservation.passengers,
+        trajet,
+        allerRetour: reservation.allerRetour,
+        price: reservation.price,
+        notes: reservation.notes,
+      })
+    );
 
     return NextResponse.json({ success: true, reservation });
   } catch {
