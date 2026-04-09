@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-gold: #C9A84C;
+  --color-gold-light: #E8D48B;
+  --color-gold-dark: #A07D2E;
+}
+
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8D48B;
+  --gold-dark: #A07D2E;
+  --dark: #0A0A0A;
+  --dark-card: #141414;
+  --dark-border: #262626;
+}
+
+body {
+  background: var(--dark);
+  color: #F5F5F5;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--dark); }
+::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 3px; }
+
+.text-gold-gradient {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: #0A0A0A;
+  font-weight: 700;
+  padding: 0.875rem 2rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.875rem;
+}
+.btn-gold:hover {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  transform: translateY(-1px);
+  box-shadow: 0 8px 30px rgba(201, 168, 76, 0.3);
+}
+
+.card-dark {
+  background: var(--dark-card);
+  border: 1px solid var(--dark-border);
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+.card-dark:hover {
+  border-color: var(--gold-dark);
+  box-shadow: 0 4px 20px rgba(201, 168, 76, 0.08);
+}
+
+.input-dark {
+  background: var(--dark);
+  border: 1px solid var(--dark-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: #F5F5F5;
+  width: 100%;
+  transition: border-color 0.2s;
+  font-size: 1rem;
+}
+.input-dark:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.15);
+}
+.input-dark::placeholder { color: #666; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up { animation: fadeInUp 0.8s ease forwards; }
+.animate-delay-1 { animation-delay: 0.15s; opacity: 0; }
+.animate-delay-2 { animation-delay: 0.3s; opacity: 0; }
+.animate-delay-3 { animation-delay: 0.45s; opacity: 0; }
+.animate-delay-4 { animation-delay: 0.6s; opacity: 0; }
+
+.hero-gradient {
+  background: radial-gradient(ellipse at 50% 0%, rgba(201, 168, 76, 0.08) 0%, transparent 60%);
+}
