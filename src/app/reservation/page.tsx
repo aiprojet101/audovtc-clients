@@ -1,13 +1,16 @@
 "use client";
 
-import { Suspense, useState, useEffect, useMemo } from "react";
+import { Suspense, useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Script from "next/script";
 import {
-  ArrowLeft, Calendar, Clock, MapPin, Users, CreditCard,
-  ChevronRight, Check, Phone, AlertCircle,
+  ArrowLeft, Calendar, Clock, Users, CreditCard,
+  ChevronRight, Check, Phone, AlertCircle, Loader2, Navigation,
 } from "lucide-react";
 import { FORFAITS, PRICE_PER_KM, MIN_PRICE, calculateDeposit } from "@/lib/pricing";
+import { calculateDistance } from "@/lib/distance";
+import AddressAutocomplete from "@/components/AddressAutocomplete";
 
 type Step = "trajet" | "details" | "confirm";
 
@@ -24,14 +27,17 @@ function ReservationContent() {
   const prefillForfait = searchParams.get("forfait");
 
   const [step, setStep] = useState<Step>("trajet");
-  const [mode, setMode] = useState<"forfait" | "custom">(prefillForfait ? "forfait" : "forfait");
+  const [mode, setMode] = useState<"forfait" | "custom">(prefillForfait ? "forfait" : "custom");
   const [selectedForfait, setSelectedForfait] = useState<string>(prefillForfait || "");
   const [allerRetour, setAllerRetour] = useState(false);
+  const [mapsLoaded, setMapsLoaded] = useState(false);
 
   // Custom
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
   const [customKm, setCustomKm] = useState("");
+  const [customDuration, setCustomDuration] = useState("");
+  const [calculating, setCalculating] = useState(false);
 
   // Details
   const [date, setDate] = useState("");
@@ -68,6 +74,39 @@ function ReservationContent() {
       setMode("forfait");
     }
   }, [prefillForfait]);
+
+  // Auto-calculate distance when both addresses are set
+  const computeDistance = useCallback(async (from: string, to: string) => {
+    if (!from || !to || !mapsLoaded) return;
+    setCalculating(true);
+    try {
+      const result = await calculateDistance(from, to);
+      if (result) {
+        setCustomKm(String(result.distanceKm));
+        setCustomDuration(result.duration);
+      }
+    } finally {
+      setCalculating(false);
+    }
+  }, [mapsLoaded]);
+
+  const handleFromChange = useCallback((value: string) => {
+    setCustomFrom(value);
+  }, []);
+
+  const handleFromSelect = useCallback((value: string) => {
+    setCustomFrom(value);
+    if (customTo) computeDistance(value, customTo);
+  }, [customTo, computeDistance]);
+
+  const handleToChange = useCallback((value: string) => {
+    setCustomTo(value);
+  }, []);
+
+  const handleToSelect = useCallback((value: string) => {
+    setCustomTo(value);
+    if (customFrom) computeDistance(customFrom, value);
+  }, [customFrom, computeDistance]);
 
   const canProceedTrajet =
     (mode === "forfait" && selectedForfait) ||
@@ -132,6 +171,11 @@ function ReservationContent() {
 
   return (
     <div className="min-h-screen pb-20">
+      <Script
+        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&libraries=places`}
+        onLoad={() => setMapsLoaded(true)}
+      />
+
       {/* Header */}
       <div className="bg-[#0A0A0A] border-b border-[#262626] px-6 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
@@ -167,17 +211,9 @@ function ReservationContent() {
         {step === "trajet" && (
           <div className="animate-fade-in-up">
             <h1 className="text-2xl font-bold mb-2">Choisissez votre trajet</h1>
-            <p className="text-zinc-500 mb-8">Forfait ou trajet personnalisé</p>
+            <p className="text-zinc-500 mb-8">Entrez vos adresses ou choisissez un forfait</p>
 
             <div className="flex gap-3 mb-8">
-              <button
-                onClick={() => setMode("forfait")}
-                className={`flex-1 py-3 rounded-lg text-sm font-medium transition ${
-                  mode === "forfait" ? "bg-[#C9A84C] text-black" : "bg-[#141414] border border-[#262626] text-zinc-400"
-                }`}
-              >
-                Forfait
-              </button>
               <button
                 onClick={() => setMode("custom")}
                 className={`flex-1 py-3 rounded-lg text-sm font-medium transition ${
@@ -186,7 +222,51 @@ function ReservationContent() {
               >
                 Trajet libre
               </button>
+              <button
+                onClick={() => setMode("forfait")}
+                className={`flex-1 py-3 rounded-lg text-sm font-medium transition ${
+                  mode === "forfait" ? "bg-[#C9A84C] text-black" : "bg-[#141414] border border-[#262626] text-zinc-400"
+                }`}
+              >
+                Forfait
+              </button>
             </div>
+
+            {mode === "custom" && (
+              <div className="space-y-4">
+                <AddressAutocomplete
+                  label="Départ"
+                  placeholder="Tapez votre adresse de départ..."
+                  value={customFrom}
+                  onChange={(val, placeId) => placeId ? handleFromSelect(val) : handleFromChange(val)}
+                  iconColor="text-zinc-600"
+                />
+                <AddressAutocomplete
+                  label="Arrivée"
+                  placeholder="Tapez votre destination..."
+                  value={customTo}
+                  onChange={(val, placeId) => placeId ? handleToSelect(val) : handleToChange(val)}
+                  iconColor="text-[#C9A84C]"
+                />
+
+                {/* Distance result */}
+                {calculating && (
+                  <div className="flex items-center gap-2 text-sm text-zinc-500 py-3">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Calcul de la distance...
+                  </div>
+                )}
+                {customKm && !calculating && mode === "custom" && (
+                  <div className="card-dark p-4 flex items-center gap-4">
+                    <Navigation className="w-5 h-5 text-[#C9A84C]" />
+                    <div>
+                      <p className="text-sm font-medium">{customKm} km</p>
+                      {customDuration && <p className="text-xs text-zinc-500">Environ {customDuration}</p>}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {mode === "forfait" && (
               <div className="space-y-3">
@@ -205,30 +285,6 @@ function ReservationContent() {
                     <p className="text-lg font-bold text-[#C9A84C]">{f.price}€</p>
                   </button>
                 ))}
-              </div>
-            )}
-
-            {mode === "custom" && (
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm text-zinc-500 mb-1 block">Départ</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 w-4 h-4 text-zinc-600" />
-                    <input className="input-dark pl-10" placeholder="Adresse de départ" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)} />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm text-zinc-500 mb-1 block">Arrivée</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 w-4 h-4 text-[#C9A84C]" />
-                    <input className="input-dark pl-10" placeholder="Adresse d'arrivée" value={customTo} onChange={(e) => setCustomTo(e.target.value)} />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm text-zinc-500 mb-1 block">Distance estimée (km)</label>
-                  <input className="input-dark" type="number" placeholder="Ex: 35" value={customKm} onChange={(e) => setCustomKm(e.target.value)} />
-                  <p className="text-xs text-zinc-600 mt-1">Utilisez Google Maps pour estimer la distance. Morgan confirmera le tarif exact.</p>
-                </div>
               </div>
             )}
 
@@ -358,6 +414,12 @@ function ReservationContent() {
                   {allerRetour ? " (A/R)" : ""}
                 </span>
               </div>
+              {customDuration && mode === "custom" && (
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">Distance / Durée</span>
+                  <span>{customKm} km — {customDuration}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-zinc-500">Date & heure</span>
                 <span>{date} à {time}</span>
