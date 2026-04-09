@@ -41,10 +41,13 @@ export default function AddressAutocomplete({ label, placeholder, value, onChang
         <MapPin className={`absolute left-3 top-3 w-4 h-4 ${iconColor}`} />
         <input
           ref={inputRef}
+          type="text"
+          autoComplete="off"
           className="input-dark pl-10"
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
         />
       </div>
     </div>
