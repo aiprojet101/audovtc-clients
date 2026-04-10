@@ -1,0 +1,24 @@
+{
+  "name": "AudoVTC — Chauffeur VTC",
+  "short_name": "AudoVTC",
+  "description": "Votre chauffeur privé dans l'Audomarois. Réservez en 30 secondes.",
+  "start_url": "/reservation",
+  "display": "standalone",
+  "background_color": "#0A0A0A",
+  "theme_color": "#C9A84C",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
