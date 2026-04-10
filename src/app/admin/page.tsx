@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   Calendar, Clock, MapPin, Users, Phone, Mail,
-  Check, X, RefreshCw, Car, Euro, ChevronDown,
+  Check, X, RefreshCw, Car, Euro, ChevronDown, Lock,
 } from "lucide-react";
 import { FORFAITS } from "@/lib/pricing";
 
@@ -32,6 +32,9 @@ export default function AdminPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "pending" | "confirmed" | "cancelled">("all");
+  const [password, setPassword] = useState("");
+  const [authenticated, setAuthenticated] = useState(false);
+  const [authError, setAuthError] = useState(false);
 
   const fetchReservations = useCallback(async () => {
     setLoading(true);
@@ -48,7 +51,51 @@ export default function AdminPage() {
     }
   }, []);
 
-  useEffect(() => { fetchReservations(); }, [fetchReservations]);
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      const res = await fetch("/api/admin/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        setAuthenticated(true);
+        setAuthError(false);
+        fetchReservations();
+      } else {
+        setAuthError(true);
+      }
+    } catch {
+      setAuthError(true);
+    }
+  }
+
+  useEffect(() => { if (authenticated) fetchReservations(); }, [authenticated, fetchReservations]);
+
+  if (!authenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-6">
+        <form onSubmit={handleLogin} className="card-dark p-8 max-w-sm w-full">
+          <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#C9A84C]/10 flex items-center justify-center">
+            <Lock className="w-6 h-6 text-[#C9A84C]" />
+          </div>
+          <h1 className="text-xl font-bold text-center mb-2">Administration</h1>
+          <p className="text-xs text-zinc-500 text-center mb-6">Entrez votre mot de passe</p>
+          {authError && <p className="text-xs text-red-400 text-center mb-3">Mot de passe incorrect</p>}
+          <input
+            type="password"
+            className="input-dark mb-4"
+            placeholder="Mot de passe"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoFocus
+          />
+          <button type="submit" className="btn-gold w-full">Connexion</button>
+        </form>
+      </div>
+    );
+  }
 
   async function updateStatus(id: string, status: "confirmed" | "cancelled") {
     await fetch("/api/admin/reservations", {
