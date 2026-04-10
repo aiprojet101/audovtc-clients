@@ -82,7 +82,7 @@ export default function AdminPage() {
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-gold-gradient font-bold text-lg">AUDOVTC Admin</h1>
-            <p className="text-xs text-zinc-600">Tableau de bord de Morgan</p>
+            <p className="text-xs text-zinc-600">Tableau de bord</p>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={fetchReservations} className="p-2 rounded-lg bg-[#141414] border border-[#262626] text-zinc-400 hover:text-white transition">

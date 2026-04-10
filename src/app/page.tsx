@@ -15,16 +15,16 @@ const FEATURES = [
 ];
 
 const TESTIMONIALS = [
-  { name: "Léa M.", text: "Super service ! Morgan est ponctuel et le véhicule est impeccable. On réserve chaque week-end pour sortir.", stars: 5, tag: "Sortie discothèque" },
+  { name: "Léa M.", text: "Super service ! Le chauffeur est ponctuel et le véhicule est impeccable. On réserve chaque week-end pour sortir.", stars: 5, tag: "Sortie discothèque" },
   { name: "Thomas D.", text: "Enfin un VTC fiable dans la région. Prix clairs, pas de surprises. Je recommande à 100%.", stars: 5, tag: "Trajet aéroport" },
   { name: "Chloé R.", text: "Parfait pour les soirées en discothèque. On rentre en sécurité et le tarif est fixe. Top !", stars: 5, tag: "Soirée entre amis" },
-  { name: "Maxime L.", text: "Véhicule propre et confortable, Morgan est très sympa. Le meilleur VTC du coin, loin devant.", stars: 5, tag: "Client régulier" },
+  { name: "Maxime L.", text: "Véhicule propre et confortable, chauffeur très sympa. Le meilleur VTC du coin, loin devant.", stars: 5, tag: "Client régulier" },
 ];
 
 const STEPS = [
   { num: "01", title: "Choisissez", desc: "Sélectionnez votre trajet ou entrez vos adresses" },
   { num: "02", title: "Réservez", desc: "Indiquez date, heure et nombre de passagers" },
-  { num: "03", title: "Roulez", desc: "Morgan vous prend en charge, détendez-vous" },
+  { num: "03", title: "Roulez", desc: "Votre chauffeur vous prend en charge, détendez-vous" },
 ];
 
 const categories = [...new Set(FORFAITS.map((f) => f.category))];
@@ -77,7 +77,7 @@ export default function Home() {
           </h1>
 
           <p className="mt-8 text-lg sm:text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed animate-fade-in-up animate-delay-2">
-            Morgan vous conduit en toute sécurité, 7j/7.
+            Votre chauffeur privé, en toute sécurité, 7j/7.
             <br className="hidden sm:block" />
             Discothèques, soirées, gares, aéroports — réservez en 30 secondes.
           </p>
@@ -89,7 +89,7 @@ export default function Home() {
             </Link>
             <a href="tel:+33743289393" className="flex items-center gap-2 px-8 py-4 text-sm font-medium text-zinc-400 hover:text-white transition border border-[#262626] rounded-lg hover:border-[#C9A84C]/30">
               <Phone className="w-4 h-4" />
-              Appeler Morgan
+              Appeler
             </a>
           </div>
 

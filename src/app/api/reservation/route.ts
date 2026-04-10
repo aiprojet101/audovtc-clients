@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     reservations.push(reservation);
     await saveReservations(reservations);
 
-    // Notification Telegram à Morgan
+    // Notification Telegram
     const forfait = reservation.forfaitId
       ? FORFAITS.find((f) => f.id === reservation.forfaitId)
       : null;

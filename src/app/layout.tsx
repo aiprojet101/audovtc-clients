@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "AudoVTC — Votre chauffeur privé dans l'Audomarois",
   description:
-    "Service VTC premium à Saint-Omer et dans l'Audomarois. Transport discothèque, gare, aéroport. Réservez en ligne avec Morgan, votre chauffeur privé.",
+    "Service VTC premium à Saint-Omer et dans l'Audomarois. Transport discothèque, gare, aéroport. Réservez en ligne votre chauffeur privé.",
   keywords: [
     "VTC Saint-Omer",
     "chauffeur privé Audomarois",

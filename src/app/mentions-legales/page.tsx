@@ -26,7 +26,7 @@ export default function MentionsLegales() {
             <p>Le site audovtc.fr est édité par :</p>
             <ul className="mt-2 space-y-1">
               <li><span className="text-zinc-300">Nom commercial :</span> AudoVTC</li>
-              <li><span className="text-zinc-300">Exploitant :</span> Morgan — Chauffeur VTC</li>
+              <li><span className="text-zinc-300">Exploitant :</span> Chauffeur VTC professionnel</li>
               <li><span className="text-zinc-300">SIRET :</span> En cours d&apos;immatriculation</li>
               <li><span className="text-zinc-300">Adresse :</span> Saint-Omer, 62500, Pas-de-Calais, France</li>
               <li><span className="text-zinc-300">Téléphone :</span> 07 43 28 93 93</li>

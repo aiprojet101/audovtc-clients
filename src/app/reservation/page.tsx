@@ -167,7 +167,7 @@ function ReservationContent() {
           </div>
           <h1 className="text-2xl font-bold mb-2">Réservation confirmée !</h1>
           <p className="text-zinc-400 mb-6">
-            Votre demande a été envoyée via WhatsApp. Morgan vous confirmera rapidement.
+            Votre demande a été envoyée via WhatsApp. Votre chauffeur vous confirmera rapidement.
           </p>
           <div className="card-dark p-4 text-left text-sm space-y-2 mb-6">
             <p><span className="text-zinc-500">Trajet :</span> {forfait ? `${forfait.from} → ${forfait.to}` : `${customFrom} → ${customTo}`}{allerRetour ? " (A/R)" : ""}</p>
@@ -410,7 +410,7 @@ function ReservationContent() {
                 <input className="input-dark" type="email" placeholder="jean@email.com (optionnel)" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
               <div>
-                <label className="text-sm text-zinc-500 mb-1 block">Notes pour Morgan</label>
+                <label className="text-sm text-zinc-500 mb-1 block">Notes pour le chauffeur</label>
                 <textarea className="input-dark" rows={3} placeholder="Précisions sur le lieu, nombre de bagages..." value={notes} onChange={(e) => setNotes(e.target.value)} />
               </div>
             </div>
@@ -482,7 +482,7 @@ function ReservationContent() {
             <div className="mt-4 card-dark p-4 border-green-900/30 bg-green-900/5 flex items-start gap-3">
               <MessageCircle className="w-5 h-5 text-[#25D366] shrink-0 mt-0.5" />
               <p className="text-sm text-zinc-400">
-                En confirmant, votre réservation sera envoyée à Morgan via WhatsApp. Paiement en véhicule (carte, espèces ou SumUp).
+                En confirmant, votre réservation sera envoyée via WhatsApp. Paiement en véhicule (carte, espèces ou SumUp).
               </p>
             </div>
 

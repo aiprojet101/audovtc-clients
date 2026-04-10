@@ -24,7 +24,7 @@ export default function CGV() {
           <section>
             <h2 className="text-lg font-semibold text-white mb-3">1. Objet</h2>
             <p>
-              Les présentes Conditions Générales de Vente (CGV) régissent les prestations de transport de personnes réalisées par AudoVTC, service de Voiture de Transport avec Chauffeur (VTC) exploité par Morgan, chauffeur professionnel inscrit au registre des VTC.
+              Les présentes Conditions Générales de Vente (CGV) régissent les prestations de transport de personnes réalisées par AudoVTC, service de Voiture de Transport avec Chauffeur (VTC) chauffeur professionnel inscrit au registre des VTC.
             </p>
           </section>
 
