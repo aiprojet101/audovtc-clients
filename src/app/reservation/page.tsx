@@ -362,7 +362,20 @@ function ReservationContent() {
                   <label className="text-sm text-zinc-500 mb-1 block">Heure</label>
                   <div className="relative">
                     <Clock className="absolute left-3 top-3 w-4 h-4 text-zinc-600" />
-                    <input className="input-dark pl-10" type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+                    <input
+                      className="input-dark pl-10"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="22:30"
+                      maxLength={5}
+                      value={time}
+                      onChange={(e) => {
+                        let v = e.target.value.replace(/[^\d]/g, "");
+                        if (v.length >= 3) v = v.slice(0, 2) + ":" + v.slice(2, 4);
+                        if (v.length > 5) v = v.slice(0, 5);
+                        setTime(v);
+                      }}
+                    />
                   </div>
                 </div>
               </div>
