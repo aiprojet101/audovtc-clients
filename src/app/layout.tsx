@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { config } from "@/lib/config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,42 +15,42 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const title = `${config.brand} — Votre chauffeur privé dans le ${config.region}`;
+const description = `Service VTC premium à ${config.city} et dans le ${config.region}. Transport discothèque, gare, aéroport. Réservez en ligne votre chauffeur privé.`;
+
 export const metadata: Metadata = {
-  title: "AudoVTC — Votre chauffeur privé dans l'Audomarois",
-  description:
-    "Service VTC premium à Saint-Omer et dans l'Audomarois. Transport discothèque, gare, aéroport. Réservez en ligne votre chauffeur privé.",
+  title,
+  description,
   keywords: [
-    "VTC Saint-Omer",
-    "chauffeur privé Audomarois",
-    "VTC Pas-de-Calais",
-    "transport discothèque Saint-Omer",
-    "VTC Calais",
-    "VTC Boulogne",
-    "VTC Dunkerque",
-    "taxi Saint-Omer",
+    `VTC ${config.city}`,
+    `chauffeur privé ${config.region}`,
+    `VTC ${config.department}`,
+    `transport discothèque ${config.city}`,
+    ...config.zones.map(z => `VTC ${z}`),
+    `taxi ${config.city}`,
   ],
   manifest: "/manifest.json",
-  themeColor: "#C9A84C",
+  themeColor: config.colorPrimary,
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "AudoVTC",
+    title: config.brand,
   },
   openGraph: {
-    title: "AudoVTC — Votre chauffeur privé dans l'Audomarois",
-    description: "Réservez votre VTC premium à Saint-Omer. Discothèques, gares, aéroports.",
+    title,
+    description: `Réservez votre VTC premium à ${config.city}. Discothèques, gares, aéroports.`,
     locale: "fr_FR",
     type: "website",
-    siteName: "AudoVTC",
-    url: "https://audovtc.fr",
+    siteName: config.brand,
+    url: `https://${config.domain}`,
   },
   twitter: {
     card: "summary_large_image",
-    title: "AudoVTC — Votre chauffeur privé dans l'Audomarois",
-    description: "Réservez votre VTC premium à Saint-Omer. Discothèques, gares, aéroports.",
+    title,
+    description: `Réservez votre VTC premium à ${config.city}. Discothèques, gares, aéroports.`,
   },
   alternates: {
-    canonical: "https://audovtc.fr",
+    canonical: `https://${config.domain}`,
   },
 };
 
@@ -61,27 +62,19 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
-    name: "AudoVTC",
-    description: "Service VTC premium à Saint-Omer et dans l'Audomarois. Transport discothèque, gare, aéroport.",
-    url: "https://audovtc.fr",
-    telephone: "+33743289393",
-    email: "contact@audovtc.fr",
+    name: config.brand,
+    description,
+    url: `https://${config.domain}`,
+    telephone: config.phoneIntl,
+    email: config.email,
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Saint-Omer",
-      postalCode: "62500",
-      addressRegion: "Pas-de-Calais",
+      addressLocality: config.city,
+      postalCode: config.postalCode,
+      addressRegion: config.department,
       addressCountry: "FR",
     },
-    areaServed: [
-      { "@type": "City", name: "Saint-Omer" },
-      { "@type": "City", name: "Calais" },
-      { "@type": "City", name: "Boulogne-sur-Mer" },
-      { "@type": "City", name: "Dunkerque" },
-      { "@type": "City", name: "Hazebrouck" },
-      { "@type": "City", name: "Béthune" },
-      { "@type": "City", name: "Lille" },
-    ],
+    areaServed: config.zones.map(z => ({ "@type": "City", name: z })),
     openingHoursSpecification: {
       "@type": "OpeningHoursSpecification",
       dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
@@ -89,7 +82,7 @@ export default function RootLayout({
       closes: "23:59",
     },
     priceRange: "€€",
-    image: "https://audovtc.fr/opengraph-image",
+    image: `https://${config.domain}/opengraph-image`,
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: "5.0",

@@ -1,11 +1,10 @@
 "use client";
 
 import { MessageCircle } from "lucide-react";
-
-const WHATSAPP_NUMBER = "33743289393";
+import { config } from "@/lib/config";
 
 export function buildWhatsAppUrl(message: string) {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${config.whatsapp}?text=${encodeURIComponent(message)}`;
 }
 
 export function buildReservationMessage(r: {

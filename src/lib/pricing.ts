@@ -1,10 +1,14 @@
-// Tarification VTC Audomarois
-export const PRICE_PER_KM = 1.80; // €/km
-export const MIN_PRICE = 15; // € minimum de course
-export const BOOKING_DEPOSIT_PERCENT = 30; // % d'acompte à la réservation
+import { config } from "./config";
+
+// Re-export from config for backward compatibility
+export const PRICE_PER_KM = config.pricePerKm;
+export const MIN_PRICE = config.minPrice;
+export const BOOKING_DEPOSIT_PERCENT = config.depositPercent;
 
 // Forfaits discothèques et trajets populaires (aller simple)
-export const FORFAITS = [
+// Ces forfaits sont spécifiques à chaque chauffeur
+// Ils peuvent être définis via NEXT_PUBLIC_DRIVER_FORFAITS (JSON) ou garder les défauts
+const DEFAULT_FORFAITS = [
   // Discothèques
   { id: "so-macumba", from: "Saint-Omer", to: "Le Macumba (Englos)", km: 65, price: 90, category: "disco" },
   { id: "so-palace", from: "Saint-Omer", to: "Le Palace (Longuenesse)", km: 5, price: 15, category: "disco" },
@@ -24,18 +28,25 @@ export const FORFAITS = [
   { id: "so-lille", from: "Saint-Omer", to: "Lille", km: 75, price: 100, category: "ville" },
   { id: "so-hazebrouck", from: "Saint-Omer", to: "Hazebrouck", km: 25, price: 38, category: "ville" },
   { id: "so-bethune", from: "Saint-Omer", to: "Béthune", km: 35, price: 50, category: "ville" },
-] as const;
+];
+
+function loadForfaits() {
+  const env = process.env.NEXT_PUBLIC_DRIVER_FORFAITS;
+  if (env) {
+    try {
+      return JSON.parse(env);
+    } catch {
+      return DEFAULT_FORFAITS;
+    }
+  }
+  return DEFAULT_FORFAITS;
+}
+
+export const FORFAITS: { id: string; from: string; to: string; km: number; price: number; category: string }[] = loadForfaits();
 
 export type Forfait = typeof FORFAITS[number];
 
-export function calculatePrice(distanceKm: number): number {
-  const price = distanceKm * PRICE_PER_KM;
-  return Math.max(price, MIN_PRICE);
-}
-
-export function calculateDeposit(totalPrice: number): number {
-  return Math.ceil(totalPrice * BOOKING_DEPOSIT_PERCENT / 100);
-}
+export { calculatePrice, calculateDeposit } from "./config";
 
 export function getCategoryLabel(category: string): string {
   switch (category) {

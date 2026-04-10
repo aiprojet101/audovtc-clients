@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { config } from "@/lib/config";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -9,6 +10,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin", "/api/"],
       },
     ],
-    sitemap: "https://audovtc.fr/sitemap.xml",
+    sitemap: `https://${config.domain}/sitemap.xml`,
   };
 }

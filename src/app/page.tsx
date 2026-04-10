@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Car, Clock, CreditCard, MapPin, Phone, Shield, Star, ChevronRight, ArrowRight, Sparkles, Users, MessageCircle } from "lucide-react";
+import { config } from "@/lib/config";
 import { FORFAITS, getCategoryLabel } from "@/lib/pricing";
 
 const FEATURES = [
   { icon: Clock, title: "Disponible 7j/7", desc: "Soirs et week-ends, quand vous en avez besoin" },
   { icon: Shield, title: "Sécurité garantie", desc: "Chauffeur professionnel certifié VTC" },
   { icon: CreditCard, title: "Prix transparents", desc: "Tarifs fixes, pas de mauvaises surprises" },
-  { icon: MapPin, title: "Tout l'Audomarois", desc: "Saint-Omer, Calais, Boulogne, Dunkerque, Lille" },
+  { icon: MapPin, title: `Tout le ${config.region}`, desc: config.zones.join(", ") },
   { icon: Users, title: "Jusqu'à 7 places", desc: "Parfait pour les groupes et soirées entre amis" },
   { icon: MessageCircle, title: "Confirmation immédiate", desc: "Réponse rapide par SMS ou appel" },
 ];
@@ -41,12 +42,12 @@ export default function Home() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#C9A84C] to-[#A07D2E] flex items-center justify-center">
               <Car className="w-4 h-4 text-black" />
             </div>
-            <span className="text-lg font-bold tracking-tight">AUDO<span className="text-[#C9A84C]">VTC</span></span>
+            <span className="text-lg font-bold tracking-tight">{config.brandShort}</span>
           </div>
           <div className="flex items-center gap-5">
-            <a href="tel:+33743289393" className="hidden sm:flex items-center gap-2 text-sm text-zinc-400 hover:text-[#C9A84C] transition">
+            <a href={`tel:${config.phoneIntl}`} className="hidden sm:flex items-center gap-2 text-sm text-zinc-400 hover:text-[#C9A84C] transition">
               <Phone className="w-4 h-4" />
-              07 43 28 93 93
+              {config.phone}
             </a>
             <Link href="/reservation" className="btn-gold !py-2.5 !px-6 !text-xs">
               Réserver
@@ -57,7 +58,6 @@ export default function Home() {
 
       {/* Hero */}
       <section className="relative flex flex-col items-center justify-center min-h-screen pt-20">
-        {/* Background effects */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#C9A84C]/5 via-transparent to-transparent" />
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#C9A84C]/5 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C9A84C]/20 to-transparent" />
@@ -66,7 +66,7 @@ export default function Home() {
           <div className="animate-fade-in-up">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#C9A84C]/10 border border-[#C9A84C]/20 text-sm text-[#C9A84C] mb-8">
               <Sparkles className="w-3.5 h-3.5" />
-              Service VTC Premium — Saint-Omer & Audomarois
+              Service VTC Premium — {config.city} & {config.region}
             </div>
           </div>
 
@@ -87,7 +87,7 @@ export default function Home() {
               Réserver maintenant
               <ArrowRight className="w-5 h-5" />
             </Link>
-            <a href="tel:+33743289393" className="flex items-center gap-2 px-8 py-4 text-sm font-medium text-zinc-400 hover:text-white transition border border-[#262626] rounded-lg hover:border-[#C9A84C]/30">
+            <a href={`tel:${config.phoneIntl}`} className="flex items-center gap-2 px-8 py-4 text-sm font-medium text-zinc-400 hover:text-white transition border border-[#262626] rounded-lg hover:border-[#C9A84C]/30">
               <Phone className="w-4 h-4" />
               Appeler
             </a>
@@ -140,7 +140,7 @@ export default function Home() {
       <section className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <p className="text-[#C9A84C] text-sm font-medium uppercase tracking-widest text-center mb-3">Nos avantages</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4">Pourquoi choisir <span className="text-gold-gradient">AudoVTC</span></h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4">Pourquoi choisir <span className="text-gold-gradient">{config.brand}</span></h2>
           <p className="text-center text-zinc-500 mb-16 max-w-lg mx-auto">Un service premium pensé pour vous.</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {FEATURES.map((f) => (
@@ -163,9 +163,8 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <p className="text-[#C9A84C] text-sm font-medium uppercase tracking-widest text-center mb-3">Tarifs</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4">Prix <span className="text-gold-gradient">forfaitaires</span></h2>
-          <p className="text-center text-zinc-500 mb-12 max-w-lg mx-auto">Prix fixes depuis Saint-Omer, aller simple. Pas de surprises.</p>
+          <p className="text-center text-zinc-500 mb-12 max-w-lg mx-auto">Prix fixes depuis {config.city}, aller simple. Pas de surprises.</p>
 
-          {/* Category tabs */}
           <div className="flex justify-center gap-2 mb-10">
             {categories.map((cat) => (
               <button
@@ -202,11 +201,8 @@ export default function Home() {
           </div>
 
           <div className="mt-10 text-center">
-            <Link
-              href="/reservation"
-              className="inline-flex items-center gap-2 text-sm text-[#C9A84C] hover:text-[#E8D48B] transition font-medium"
-            >
-              Trajet personnalisé ? 1,80€/km
+            <Link href="/reservation" className="inline-flex items-center gap-2 text-sm text-[#C9A84C] hover:text-[#E8D48B] transition font-medium">
+              Trajet personnalisé ? {config.pricePerKm.toFixed(2).replace(".", ",")}€/km
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -249,9 +245,9 @@ export default function Home() {
               Réserver mon VTC
               <ArrowRight className="w-5 h-5" />
             </Link>
-            <a href="tel:+33743289393" className="flex items-center gap-2 px-8 py-4 text-sm font-medium text-zinc-400 hover:text-white transition">
+            <a href={`tel:${config.phoneIntl}`} className="flex items-center gap-2 px-8 py-4 text-sm font-medium text-zinc-400 hover:text-white transition">
               <Phone className="w-4 h-4" />
-              07 43 28 93 93
+              {config.phone}
             </a>
           </div>
         </div>
@@ -266,20 +262,20 @@ export default function Home() {
                 <Car className="w-4 h-4 text-black" />
               </div>
               <div>
-                <span className="font-bold">AUDO<span className="text-[#C9A84C]">VTC</span></span>
-                <p className="text-xs text-zinc-700">Chauffeur VTC — Saint-Omer & Audomarois</p>
+                <span className="font-bold">{config.brandShort}</span>
+                <p className="text-xs text-zinc-700">Chauffeur VTC — {config.city} & {config.region}</p>
               </div>
             </div>
             <div className="flex items-center gap-6 text-sm text-zinc-500">
-              <a href="tel:+33743289393" className="hover:text-[#C9A84C] transition flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5" /> 07 43 28 93 93
+              <a href={`tel:${config.phoneIntl}`} className="hover:text-[#C9A84C] transition flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5" /> {config.phone}
               </a>
-              <a href="mailto:contact@audovtc.fr" className="hover:text-[#C9A84C] transition">contact@audovtc.fr</a>
+              <a href={`mailto:${config.email}`} className="hover:text-[#C9A84C] transition">{config.email}</a>
               <Link href="/reservation" className="hover:text-[#C9A84C] transition">Réserver</Link>
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-700">
-            <span>&copy; {new Date().getFullYear()} AudoVTC — Tous droits réservés</span>
+            <span>&copy; {new Date().getFullYear()} {config.brand} — Tous droits réservés</span>
             <div className="flex gap-4">
               <Link href="/mentions-legales" className="hover:text-zinc-400 transition">Mentions légales</Link>
               <Link href="/cgv" className="hover:text-zinc-400 transition">CGV</Link>
