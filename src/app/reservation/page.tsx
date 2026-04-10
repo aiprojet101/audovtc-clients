@@ -3,13 +3,11 @@
 import { Suspense, useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import Script from "next/script";
 import {
   ArrowLeft, Calendar, Clock, Users, CreditCard,
   ChevronRight, Check, Phone, Loader2, Navigation, MessageCircle,
 } from "lucide-react";
 import { FORFAITS, PRICE_PER_KM, MIN_PRICE, calculateDeposit } from "@/lib/pricing";
-import { calculateDistance } from "@/lib/distance";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 import { buildWhatsAppUrl, buildReservationMessage } from "@/components/WhatsAppButton";
 
@@ -31,7 +29,6 @@ function ReservationContent() {
   const [mode, setMode] = useState<"forfait" | "custom">(prefillForfait ? "forfait" : "custom");
   const [selectedForfait, setSelectedForfait] = useState<string>(prefillForfait || "");
   const [allerRetour, setAllerRetour] = useState(false);
-  const [mapsLoaded, setMapsLoaded] = useState(false);
 
   // Custom
   const [customFrom, setCustomFrom] = useState("");
@@ -78,18 +75,19 @@ function ReservationContent() {
 
   // Auto-calculate distance when both addresses are set
   const computeDistance = useCallback(async (from: string, to: string) => {
-    if (!from || !to || !mapsLoaded) return;
+    if (!from || !to) return;
     setCalculating(true);
     try {
-      const result = await calculateDistance(from, to);
-      if (result) {
-        setCustomKm(String(result.distanceKm));
-        setCustomDuration(result.duration);
+      const res = await fetch(`/api/distance?origin=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}`);
+      if (res.ok) {
+        const data = await res.json();
+        setCustomKm(String(data.distanceKm));
+        setCustomDuration(data.duration);
       }
     } finally {
       setCalculating(false);
     }
-  }, [mapsLoaded]);
+  }, []);
 
   const handleFromSelected = useCallback((value: string) => {
     setCustomFrom(value);
@@ -197,11 +195,6 @@ function ReservationContent() {
 
   return (
     <div className="min-h-screen pb-20">
-      <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&libraries=places`}
-        onLoad={() => setMapsLoaded(true)}
-      />
-
       {/* Header */}
       <div className="bg-[#0A0A0A] border-b border-[#262626] px-6 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between">

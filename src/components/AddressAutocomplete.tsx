@@ -20,17 +20,9 @@ export default function AddressAutocomplete({ label, placeholder, onPlaceSelecte
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
-  const serviceRef = useRef<google.maps.places.AutocompleteService | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (window.google && !serviceRef.current) {
-      serviceRef.current = new window.google.maps.places.AutocompleteService();
-    }
-  }, []);
-
-  // Close dropdown on outside click
   useEffect(() => {
     function handleClick(e: Event) {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
@@ -52,40 +44,22 @@ export default function AddressAutocomplete({ label, placeholder, onPlaceSelecte
     if (value.length < 3) {
       setPredictions([]);
       setShowDropdown(false);
+      setLoading(false);
       return;
     }
 
     setLoading(true);
-    timeoutRef.current = setTimeout(() => {
-      if (!serviceRef.current) {
-        // Retry init
-        if (window.google) {
-          serviceRef.current = new window.google.maps.places.AutocompleteService();
-        } else {
-          setLoading(false);
-          return;
-        }
+    timeoutRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/places?q=${encodeURIComponent(value)}`);
+        const data = await res.json();
+        setPredictions(data);
+        setShowDropdown(data.length > 0);
+      } catch {
+        setPredictions([]);
+      } finally {
+        setLoading(false);
       }
-
-      serviceRef.current.getPlacePredictions(
-        {
-          input: value,
-          componentRestrictions: { country: "fr" },
-          types: ["geocode", "establishment"],
-        },
-        (results, status) => {
-          setLoading(false);
-          if (status === "OK" && results) {
-            setPredictions(results.map((r) => ({
-              description: r.description,
-              place_id: r.place_id,
-            })));
-            setShowDropdown(true);
-          } else {
-            setPredictions([]);
-          }
-        }
-      );
     }, 300);
   }
 
@@ -112,12 +86,6 @@ export default function AddressAutocomplete({ label, placeholder, onPlaceSelecte
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => { if (predictions.length > 0) setShowDropdown(true); }}
-          onBlur={() => {
-            // Delay to allow click on prediction
-            setTimeout(() => {
-              if (query && !showDropdown) onPlaceSelected(query);
-            }, 200);
-          }}
         />
         {loading && <Loader2 className="absolute right-3 top-3 w-4 h-4 text-zinc-600 animate-spin" />}
       </div>
