@@ -274,11 +274,16 @@ export default function Home() {
               <a href="tel:+33743289393" className="hover:text-[#C9A84C] transition flex items-center gap-1.5">
                 <Phone className="w-3.5 h-3.5" /> 07 43 28 93 93
               </a>
+              <a href="mailto:contact@audovtc.fr" className="hover:text-[#C9A84C] transition">contact@audovtc.fr</a>
               <Link href="/reservation" className="hover:text-[#C9A84C] transition">Réserver</Link>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-white/5 text-center text-xs text-zinc-800">
-            &copy; {new Date().getFullYear()} AudoVTC — Tous droits réservés
+          <div className="mt-8 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-700">
+            <span>&copy; {new Date().getFullYear()} AudoVTC — Tous droits réservés</span>
+            <div className="flex gap-4">
+              <Link href="/mentions-legales" className="hover:text-zinc-400 transition">Mentions légales</Link>
+              <Link href="/cgv" className="hover:text-zinc-400 transition">CGV</Link>
+            </div>
           </div>
         </div>
       </footer>
