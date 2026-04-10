@@ -91,22 +91,14 @@ function ReservationContent() {
     }
   }, [mapsLoaded]);
 
-  const handleFromChange = useCallback((value: string) => {
+  const handleFromSelected = useCallback((value: string) => {
     setCustomFrom(value);
-  }, []);
-
-  const handleFromSelect = useCallback((value: string) => {
-    setCustomFrom(value);
-    if (customTo) computeDistance(value, customTo);
+    if (customTo && value) computeDistance(value, customTo);
   }, [customTo, computeDistance]);
 
-  const handleToChange = useCallback((value: string) => {
+  const handleToSelected = useCallback((value: string) => {
     setCustomTo(value);
-  }, []);
-
-  const handleToSelect = useCallback((value: string) => {
-    setCustomTo(value);
-    if (customFrom) computeDistance(customFrom, value);
+    if (customFrom && value) computeDistance(customFrom, value);
   }, [customFrom, computeDistance]);
 
   const canProceedTrajet =
@@ -271,15 +263,13 @@ function ReservationContent() {
                 <AddressAutocomplete
                   label="Départ"
                   placeholder="Tapez votre adresse de départ..."
-                  value={customFrom}
-                  onChange={(val, placeId) => placeId ? handleFromSelect(val) : handleFromChange(val)}
+                  onPlaceSelected={handleFromSelected}
                   iconColor="text-zinc-600"
                 />
                 <AddressAutocomplete
                   label="Arrivée"
                   placeholder="Tapez votre destination..."
-                  value={customTo}
-                  onChange={(val, placeId) => placeId ? handleToSelect(val) : handleToChange(val)}
+                  onPlaceSelected={handleToSelected}
                   iconColor="text-[#C9A84C]"
                 />
 

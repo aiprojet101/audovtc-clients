@@ -1,17 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { MapPin } from "lucide-react";
 
 interface Props {
   label: string;
   placeholder: string;
-  value: string;
-  onChange: (value: string, placeId?: string) => void;
+  onPlaceSelected: (address: string) => void;
+  defaultValue?: string;
   iconColor?: string;
 }
 
-export default function AddressAutocomplete({ label, placeholder, value, onChange, iconColor = "text-zinc-600" }: Props) {
+export default function AddressAutocomplete({ label, placeholder, onPlaceSelected, defaultValue = "", iconColor = "text-zinc-600" }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
@@ -20,34 +20,37 @@ export default function AddressAutocomplete({ label, placeholder, value, onChang
 
     const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
       componentRestrictions: { country: "fr" },
-      fields: ["formatted_address", "place_id", "geometry"],
+      fields: ["formatted_address", "place_id"],
       types: ["geocode", "establishment"],
     });
 
     autocomplete.addListener("place_changed", () => {
       const place = autocomplete.getPlace();
       if (place.formatted_address) {
-        onChange(place.formatted_address, place.place_id);
+        onPlaceSelected(place.formatted_address);
       }
     });
 
     autocompleteRef.current = autocomplete;
-  }, [onChange]);
+  }, [onPlaceSelected]);
 
   return (
     <div>
       <label className="text-sm text-zinc-500 mb-1 block">{label}</label>
       <div className="relative">
-        <MapPin className={`absolute left-3 top-3 w-4 h-4 ${iconColor}`} />
+        <MapPin className={`absolute left-3 top-3 w-4 h-4 ${iconColor} pointer-events-none`} />
         <input
           ref={inputRef}
           type="text"
           autoComplete="off"
           className="input-dark pl-10"
           placeholder={placeholder}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+          defaultValue={defaultValue}
+          onBlur={() => {
+            if (inputRef.current) {
+              onPlaceSelected(inputRef.current.value);
+            }
+          }}
         />
       </div>
     </div>
