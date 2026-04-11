@@ -36,6 +36,11 @@ export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [authError, setAuthError] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [showPwdModal, setShowPwdModal] = useState(false);
+  const [newPwd, setNewPwd] = useState("");
+  const [confirmPwd, setConfirmPwd] = useState("");
+  const [pwdMsg, setPwdMsg] = useState("");
+  const [pwdLoading, setPwdLoading] = useState(false);
 
   // Auto-login si mot de passe sauvegardé
   useEffect(() => {
@@ -120,6 +125,35 @@ export default function AdminPage() {
     );
   }
 
+  async function changePassword() {
+    if (newPwd.length < 6) { setPwdMsg("6 caractères minimum"); return; }
+    if (newPwd !== confirmPwd) { setPwdMsg("Les mots de passe ne correspondent pas"); return; }
+    setPwdLoading(true);
+    setPwdMsg("");
+    try {
+      const domain = window.location.hostname;
+      const slug = domain.replace(".vtc-site.fr", "");
+      const res = await fetch("https://vtc-site.fr/api/client/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, currentPassword: password, newPassword: newPwd }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPwdMsg("Mot de passe mis à jour. Rechargez la page dans 1 minute.");
+        setPassword(newPwd);
+        localStorage.setItem("admin_pwd", newPwd);
+        setTimeout(() => setShowPwdModal(false), 3000);
+      } else {
+        setPwdMsg(data.error || "Erreur");
+      }
+    } catch {
+      setPwdMsg("Erreur de connexion");
+    } finally {
+      setPwdLoading(false);
+    }
+  }
+
   async function updateStatus(id: string, status: "confirmed" | "cancelled") {
     await fetch("/api/admin/reservations", {
       method: "PATCH",
@@ -155,6 +189,9 @@ export default function AdminPage() {
             <p className="text-xs text-zinc-600">Tableau de bord</p>
           </div>
           <div className="flex items-center gap-3">
+            <button onClick={() => setShowPwdModal(true)} className="p-2 rounded-lg bg-[#141414] border border-[#262626] text-zinc-400 hover:text-white transition" title="Changer le mot de passe">
+              <Lock className="w-4 h-4" />
+            </button>
             <button onClick={fetchReservations} className="p-2 rounded-lg bg-[#141414] border border-[#262626] text-zinc-400 hover:text-white transition">
               <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
             </button>
@@ -267,6 +304,24 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+
+      {/* Modale changement mot de passe */}
+      {showPwdModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4" onClick={() => setShowPwdModal(false)}>
+          <div className="card-dark p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            <h2 className="font-bold mb-4 flex items-center gap-2"><Lock className="w-4 h-4 text-[#C9A84C]" /> Changer le mot de passe</h2>
+            <div className="space-y-3">
+              <input type="password" className="input-dark" placeholder="Nouveau mot de passe" value={newPwd} onChange={(e) => setNewPwd(e.target.value)} />
+              <input type="password" className="input-dark" placeholder="Confirmer le mot de passe" value={confirmPwd} onChange={(e) => setConfirmPwd(e.target.value)} />
+              {pwdMsg && <p className={`text-xs ${pwdMsg.includes("mis à jour") ? "text-green-500" : "text-red-400"}`}>{pwdMsg}</p>}
+              <div className="flex gap-3">
+                <button onClick={() => setShowPwdModal(false)} className="flex-1 py-2 rounded-lg bg-[#141414] border border-[#262626] text-zinc-400 text-sm">Annuler</button>
+                <button onClick={changePassword} disabled={pwdLoading} className="btn-gold flex-1 !py-2 !text-xs">{pwdLoading ? "..." : "Valider"}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
