@@ -57,6 +57,7 @@ export function getCategoryLabel(category: string): string {
     case "disco": return "Discothèques";
     case "gare": return "Gares & Aéroports";
     case "ville": return "Villes";
+    case "lieu": return "Lieux";
     default: return category;
   }
 }
