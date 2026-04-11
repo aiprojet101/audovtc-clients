@@ -35,6 +35,23 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
   const [authError, setAuthError] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // Auto-login si mot de passe sauvegardé
+  useEffect(() => {
+    const saved = localStorage.getItem("admin_pwd");
+    if (saved) {
+      setPassword(saved);
+      fetch("/api/admin/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: saved }),
+      }).then(res => {
+        if (res.ok) { setAuthenticated(true); }
+        else { localStorage.removeItem("admin_pwd"); }
+      });
+    }
+  }, []);
 
   const fetchReservations = useCallback(async () => {
     setLoading(true);
@@ -62,9 +79,11 @@ export default function AdminPage() {
       if (res.ok) {
         setAuthenticated(true);
         setAuthError(false);
+        if (rememberMe) localStorage.setItem("admin_pwd", password);
         fetchReservations();
       } else {
         setAuthError(true);
+        localStorage.removeItem("admin_pwd");
       }
     } catch {
       setAuthError(true);
@@ -91,6 +110,10 @@ export default function AdminPage() {
             onChange={(e) => setPassword(e.target.value)}
             autoFocus
           />
+          <label className="flex items-center gap-2 mb-4 cursor-pointer">
+            <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 accent-[#C9A84C]" />
+            <span className="text-xs text-zinc-500">Rester connecté</span>
+          </label>
           <button type="submit" className="btn-gold w-full">Connexion</button>
         </form>
       </div>
