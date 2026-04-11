@@ -36,9 +36,13 @@ function loadForfaits() {
     try {
       return JSON.parse(env);
     } catch {
-      return DEFAULT_FORFAITS;
+      return [];
     }
   }
+  // Pas de forfaits définis = tableau vide (trajet libre uniquement)
+  // Les DEFAULT_FORFAITS ne s'appliquent qu'à AudoVTC (domaine audovtc.fr)
+  const domain = process.env.NEXT_PUBLIC_DRIVER_DOMAIN || "";
+  if (domain && !domain.includes("audovtc")) return [];
   return DEFAULT_FORFAITS;
 }
 

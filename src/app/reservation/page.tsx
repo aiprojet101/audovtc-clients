@@ -232,24 +232,26 @@ function ReservationContent() {
             <h1 className="text-2xl font-bold mb-2">Choisissez votre trajet</h1>
             <p className="text-zinc-500 mb-8">Entrez vos adresses ou choisissez un forfait</p>
 
-            <div className="flex gap-3 mb-8">
-              <button
-                onClick={() => setMode("custom")}
-                className={`flex-1 py-3 rounded-lg text-sm font-medium transition ${
-                  mode === "custom" ? "bg-[#C9A84C] text-black" : "bg-[#141414] border border-[#262626] text-zinc-400"
-                }`}
-              >
-                Trajet libre
-              </button>
-              <button
-                onClick={() => setMode("forfait")}
-                className={`flex-1 py-3 rounded-lg text-sm font-medium transition ${
-                  mode === "forfait" ? "bg-[#C9A84C] text-black" : "bg-[#141414] border border-[#262626] text-zinc-400"
-                }`}
-              >
-                Forfait
-              </button>
-            </div>
+            {FORFAITS.length > 0 ? (
+              <div className="flex gap-3 mb-8">
+                <button
+                  onClick={() => setMode("custom")}
+                  className={`flex-1 py-3 rounded-lg text-sm font-medium transition ${
+                    mode === "custom" ? "bg-[#C9A84C] text-black" : "bg-[#141414] border border-[#262626] text-zinc-400"
+                  }`}
+                >
+                  Trajet libre
+                </button>
+                <button
+                  onClick={() => setMode("forfait")}
+                  className={`flex-1 py-3 rounded-lg text-sm font-medium transition ${
+                    mode === "forfait" ? "bg-[#C9A84C] text-black" : "bg-[#141414] border border-[#262626] text-zinc-400"
+                  }`}
+                >
+                  Forfait
+                </button>
+              </div>
+            ) : null}
 
             {mode === "custom" && (
               <div className="space-y-4">
