@@ -37,6 +37,11 @@ export default function AdminPage() {
   const [authError, setAuthError] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [showPwdModal, setShowPwdModal] = useState(false);
+  const [showPricingModal, setShowPricingModal] = useState(false);
+  const [pricePerKm, setPricePerKm] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [pricingMsg, setPricingMsg] = useState("");
+  const [pricingLoading, setPricingLoading] = useState(false);
   const [newPwd, setNewPwd] = useState("");
   const [confirmPwd, setConfirmPwd] = useState("");
   const [pwdMsg, setPwdMsg] = useState("");
@@ -125,6 +130,48 @@ export default function AdminPage() {
     );
   }
 
+  async function openPricingModal() {
+    const slug = window.location.hostname.replace(".vtc-site.fr", "");
+    setShowPricingModal(true);
+    setPricingMsg("");
+    try {
+      const res = await fetch(`https://vtc-site.fr/api/client/update-pricing?slug=${encodeURIComponent(slug)}`);
+      const data = await res.json();
+      if (res.ok) {
+        setPricePerKm(data.pricePerKm || "1.80");
+        setMinPrice(data.minPrice || "15");
+      }
+    } catch {
+      // fallback defaults
+      setPricePerKm("1.80");
+      setMinPrice("15");
+    }
+  }
+
+  async function updatePricing() {
+    setPricingLoading(true);
+    setPricingMsg("");
+    try {
+      const slug = window.location.hostname.replace(".vtc-site.fr", "");
+      const res = await fetch("https://vtc-site.fr/api/client/update-pricing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, currentPassword: password, pricePerKm, minPrice }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPricingMsg("Tarifs mis à jour. Actifs sur votre site dans 30-60 secondes.");
+        setTimeout(() => setShowPricingModal(false), 3000);
+      } else {
+        setPricingMsg(data.error || "Erreur");
+      }
+    } catch {
+      setPricingMsg("Erreur de connexion");
+    } finally {
+      setPricingLoading(false);
+    }
+  }
+
   async function changePassword() {
     if (newPwd.length < 6) { setPwdMsg("6 caractères minimum"); return; }
     if (newPwd !== confirmPwd) { setPwdMsg("Les mots de passe ne correspondent pas"); return; }
@@ -189,6 +236,9 @@ export default function AdminPage() {
             <p className="text-xs text-zinc-600">Tableau de bord</p>
           </div>
           <div className="flex items-center gap-3">
+            <button onClick={openPricingModal} className="p-2 rounded-lg bg-[#141414] border border-[#262626] text-zinc-400 hover:text-white transition" title="Modifier mes tarifs">
+              <Euro className="w-4 h-4" />
+            </button>
             <button onClick={() => setShowPwdModal(true)} className="p-2 rounded-lg bg-[#141414] border border-[#262626] text-zinc-400 hover:text-white transition" title="Changer le mot de passe">
               <Lock className="w-4 h-4" />
             </button>
@@ -306,6 +356,48 @@ export default function AdminPage() {
       </div>
 
       {/* Modale changement mot de passe */}
+      {showPricingModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4" onClick={() => setShowPricingModal(false)}>
+          <div className="card-dark p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            <h2 className="font-bold mb-4 flex items-center gap-2"><Euro className="w-4 h-4 text-[#C9A84C]" /> Modifier mes tarifs</h2>
+            <p className="text-xs text-zinc-500 mb-4">Nécessite votre mot de passe admin (celui avec lequel vous êtes connecté).</p>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-zinc-500 mb-1 block">Prix au km (€)</label>
+                <input
+                  type="number"
+                  step="0.10"
+                  min="0.01"
+                  max="10"
+                  className="input-dark"
+                  placeholder="1.80"
+                  value={pricePerKm}
+                  onChange={(e) => setPricePerKm(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-xs text-zinc-500 mb-1 block">Minimum de course (€)</label>
+                <input
+                  type="number"
+                  step="1"
+                  min="0"
+                  max="200"
+                  className="input-dark"
+                  placeholder="15"
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                />
+              </div>
+              {pricingMsg && <p className={`text-xs ${pricingMsg.includes("mis à jour") ? "text-green-500" : "text-red-400"}`}>{pricingMsg}</p>}
+              <div className="flex gap-3 pt-2">
+                <button onClick={() => setShowPricingModal(false)} className="flex-1 py-2 rounded-lg bg-[#141414] border border-[#262626] text-zinc-400 text-sm">Annuler</button>
+                <button onClick={updatePricing} disabled={pricingLoading} className="btn-gold flex-1 !py-2 !text-xs">{pricingLoading ? "..." : "Enregistrer"}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showPwdModal && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4" onClick={() => setShowPwdModal(false)}>
           <div className="card-dark p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
