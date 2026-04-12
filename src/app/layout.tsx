@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import InstallPrompt from "@/components/InstallPrompt";
 import { config } from "@/lib/config";
 
 const geistSans = Geist({
@@ -107,6 +108,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         {children}
         <WhatsAppButton />
+        <InstallPrompt />
         <Script id="sw-register" strategy="lazyOnload">
           {`if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}`}
         </Script>

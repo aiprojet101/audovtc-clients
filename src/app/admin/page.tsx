@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   Calendar, Clock, MapPin, Users, Phone, Mail,
-  Check, X, RefreshCw, Car, Euro, ChevronDown, Lock, Navigation,
+  Check, X, RefreshCw, Car, Euro, ChevronDown, Lock, Navigation, QrCode, Download,
 } from "lucide-react";
 import { FORFAITS } from "@/lib/pricing";
 
@@ -38,6 +38,7 @@ export default function AdminPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [showPwdModal, setShowPwdModal] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
   const [pricePerKm, setPricePerKm] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [pricingMsg, setPricingMsg] = useState("");
@@ -266,6 +267,9 @@ export default function AdminPage() {
             <p className="text-xs text-zinc-600">Tableau de bord</p>
           </div>
           <div className="flex items-center gap-3">
+            <button onClick={() => setShowQrModal(true)} className="p-2 rounded-lg bg-[#141414] border border-[#262626] text-zinc-400 hover:text-white transition" title="Mon QR code">
+              <QrCode className="w-4 h-4" />
+            </button>
             <button onClick={openPricingModal} className="p-2 rounded-lg bg-[#141414] border border-[#262626] text-zinc-400 hover:text-white transition" title="Modifier mes tarifs">
               <Euro className="w-4 h-4" />
             </button>
@@ -397,6 +401,34 @@ export default function AdminPage() {
       </div>
 
       {/* Modale changement mot de passe */}
+      {showQrModal && typeof window !== "undefined" && (() => {
+        const siteUrl = `https://${window.location.hostname}`;
+        const qrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(siteUrl)}&size=400&margin=2`;
+        const qrUrlHD = `https://quickchart.io/qr?text=${encodeURIComponent(siteUrl)}&size=1200&margin=4&format=png`;
+        const qrUrlSvg = `https://quickchart.io/qr?text=${encodeURIComponent(siteUrl)}&size=400&margin=4&format=svg`;
+        return (
+          <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4" onClick={() => setShowQrModal(false)}>
+            <div className="card-dark p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+              <h2 className="font-bold mb-2 flex items-center gap-2"><QrCode className="w-4 h-4 text-[#C9A84C]" /> Mon QR code</h2>
+              <p className="text-xs text-zinc-500 mb-4">Partagez-le avec vos clients : cartes de visite, véhicule, vitrines...</p>
+              <div className="bg-white rounded-xl p-4 flex items-center justify-center mb-4">
+                <img src={qrUrl} alt="QR code" width={280} height={280} />
+              </div>
+              <p className="text-xs text-zinc-500 text-center mb-4">{siteUrl}</p>
+              <div className="flex gap-2">
+                <a href={qrUrlHD} download target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-[#141414] border border-[#262626] text-zinc-300 text-sm hover:text-white transition">
+                  <Download className="w-4 h-4" /> PNG HD
+                </a>
+                <a href={qrUrlSvg} download target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-[#141414] border border-[#262626] text-zinc-300 text-sm hover:text-white transition">
+                  <Download className="w-4 h-4" /> SVG
+                </a>
+              </div>
+              <button onClick={() => setShowQrModal(false)} className="w-full mt-3 py-2 text-xs text-zinc-500 hover:text-white transition">Fermer</button>
+            </div>
+          </div>
+        );
+      })()}
+
       {showPricingModal && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4" onClick={() => setShowPricingModal(false)}>
           <div className="card-dark p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
