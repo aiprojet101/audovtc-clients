@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   Calendar, Clock, MapPin, Users, Phone, Mail,
-  Check, X, RefreshCw, Car, Euro, ChevronDown, Lock,
+  Check, X, RefreshCw, Car, Euro, ChevronDown, Lock, Navigation,
 } from "lucide-react";
 import { FORFAITS } from "@/lib/pricing";
 
@@ -227,6 +227,36 @@ export default function AdminPage() {
     return `${r.customFrom} → ${r.customTo}`;
   }
 
+  function getPickupAddress(r: Reservation): string {
+    if (r.mode === "forfait" && r.forfaitId) {
+      const f = FORFAITS.find((f) => f.id === r.forfaitId);
+      return f?.from || "";
+    }
+    return r.customFrom || "";
+  }
+
+  function getDropoffAddress(r: Reservation): string {
+    if (r.mode === "forfait" && r.forfaitId) {
+      const f = FORFAITS.find((f) => f.id === r.forfaitId);
+      return f?.to || "";
+    }
+    return r.customTo || "";
+  }
+
+  function openNavigation(r: Reservation) {
+    const pickup = getPickupAddress(r);
+    const dropoff = getDropoffAddress(r);
+    if (!pickup) return;
+    // Google Maps directions : origin auto (position actuelle) -> pickup -> dropoff
+    const destination = encodeURIComponent(pickup);
+    const waypoints = dropoff ? `&waypoints=${encodeURIComponent(pickup)}` : "";
+    const finalDest = dropoff ? encodeURIComponent(dropoff) : destination;
+    const url = dropoff
+      ? `https://www.google.com/maps/dir/?api=1&destination=${finalDest}${waypoints}&travelmode=driving`
+      : `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
+    window.open(url, "_blank");
+  }
+
   return (
     <div className="min-h-screen pb-20">
       <div className="bg-[#0A0A0A] border-b border-[#262626] px-6 py-4">
@@ -329,24 +359,35 @@ export default function AdminPage() {
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-xl font-bold text-[#C9A84C]">{r.price}€</p>
-                    {r.status === "pending" && (
-                      <div className="flex gap-2 mt-3">
+                    <div className="flex gap-2 mt-3 justify-end flex-wrap">
+                      {getPickupAddress(r) && (
                         <button
-                          onClick={() => updateStatus(r.id, "confirmed")}
-                          className="p-2 rounded-lg bg-green-500/10 text-green-500 hover:bg-green-500/20 transition"
-                          title="Confirmer"
+                          onClick={() => openNavigation(r)}
+                          className="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition"
+                          title="Ouvrir GPS"
                         >
-                          <Check className="w-4 h-4" />
+                          <Navigation className="w-4 h-4" />
                         </button>
-                        <button
-                          onClick={() => updateStatus(r.id, "cancelled")}
-                          className="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition"
-                          title="Annuler"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    )}
+                      )}
+                      {r.status === "pending" && (
+                        <>
+                          <button
+                            onClick={() => updateStatus(r.id, "confirmed")}
+                            className="p-2 rounded-lg bg-green-500/10 text-green-500 hover:bg-green-500/20 transition"
+                            title="Confirmer"
+                          >
+                            <Check className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => updateStatus(r.id, "cancelled")}
+                            className="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition"
+                            title="Annuler"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
